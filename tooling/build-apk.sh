@@ -156,12 +156,6 @@ if ((dry)); then
   exit 0
 fi
 
-# Check every selected flavor before starting any build or writing build config.
-# Debug/profile may intentionally exercise UI without a bundled runtime.
-if [[ $mode == release ]]; then
-  python3 -I "$ROOT/tooling/check_runtime_bundle.py" "${flavors[@]}"
-fi
-
 # Toolchain: use what's on PATH; the gitignored tooling/env.sh is the fallback.
 if ! command -v flutter >/dev/null 2>&1; then
   [[ -f $ROOT/tooling/env.sh ]] && source "$ROOT/tooling/env.sh"
@@ -200,14 +194,6 @@ if ((beta)); then
   mkdir -p "$APP/build"
   (umask 077; python3 -c 'import json, sys; print(json.dumps({"DSH_BETA_CHANNEL_TOKEN": open(sys.argv[1]).read().strip()}))' \
     "$beta_file" >"$beta_json")
-fi
-
-# libtawcroot.so for the tawcroot launch method (the default where available), from the pinned tawc commit.
-# Release builds must carry it; other builds go on without it (the option shows unavailable).
-if ! python3 -I "$ROOT/runtime/tawcroot/build.py"; then
-  [[ $mode == release ]] && die "tawcroot: libtawcroot.so did not build"
-  rm -rf "$ROOT/runtime/out-tawcroot" # never package an older build's library
-  echo "build-apk: building without libtawcroot.so; the tawcroot launch option will be unavailable" >&2
 fi
 
 # aapt2 to read back what was built (optional).

@@ -42,11 +42,6 @@ abstract class SideShortcuts : DefaultTask() {
     }
 }
 
-// Per-ABI runtime bundles produced by runtime/build-runtime.sh.
-val runtimeOut = rootProject.file("../../runtime/out")
-// libtawcroot.so for the opt-in tawcroot launch method (runtime/tawcroot/build.py; missing = unavailable).
-val tawcrootOut = rootProject.file("../../runtime/out-tawcroot")
-
 // versionCode is the build minute, same encoding as tooling/build_number.py:
 // (year - 2026) * 10^8 + MMDDhhmm at UTC+8. tooling/build-apk.sh passes it as
 // --build-number; this covers builds that skip the script (flutter run, the
@@ -96,32 +91,16 @@ android {
         }
     }
 
-    sourceSets {
-        getByName("main") {
-            jniLibs.srcDir(File(tawcrootOut, "jniLibs"))
-        }
-        getByName("arm64") {
-            assets.srcDir(File(runtimeOut, "arm64-v8a/assets"))
-            jniLibs.srcDir(File(runtimeOut, "arm64-v8a/jniLibs"))
-        }
-        getByName("x64") {
-            assets.srcDir(File(runtimeOut, "x86_64/assets"))
-            jniLibs.srcDir(File(runtimeOut, "x86_64/jniLibs"))
-        }
-    }
-
     packaging {
-        // proot and friends ship as lib*.so; they must be extracted to
-        // nativeLibraryDir so they can be executed.
         jniLibs {
+            // Unchanged on purpose: flipping this repackages every remaining .so, not just
+            // the extracted ones the local engine used to need.
             useLegacyPackaging = true
             // sherpa_onnx_android_* 1.13.4 and ORT Android 1.27.0 each ship an ORT 1.27.0
             // (sherpa's own build): either serves both, with the same exports.
             pickFirsts += "**/libonnxruntime.so"
             // Dart uses the Sherpa C API; the C++ wrapper has no app consumer.
             excludes += "lib/*/libsherpa-onnx-cxx-api.so"
-            // Keep the Termux binaries byte-identical to runtime/out (their hashes are in the manifest).
-            keepDebugSymbols += listOf("**/libproot.so", "**/libproot-loader.so", "**/libtalloc.so", "**/libandroid-shmem.so", "**/libtawcroot.so")
         }
         // BouncyCastle's Picnic signature tables (1.2 MB compressed): nothing here registers the PQC provider.
         resources.excludes += listOf(
