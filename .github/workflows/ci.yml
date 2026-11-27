@@ -1,13 +1,9 @@
-# A PR runs what it touches; a push to main runs everything, which also catches
-# whatever the path filters below miss. `CI OK` is the one result to look at.
-# External PRs are closed by pr-gate.yml and spend no runner here.
+# Manual dispatch only in this fork: no push, pull request or other event starts it,
+# so no runner is spent unless someone asks. A dispatch runs every area, like a push
+# to main, and `CI OK` is the one result to look at.
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

@@ -4,16 +4,9 @@
 # signing profile exist.
 name: OHOS compile
 
-# On main it runs after a merge, not on pull requests, so no PR waits for the macOS runner;
-# a change to the shared app that breaks the HarmonyOS build shows up on main's run.
+# Manual dispatch only in this fork: nothing starts it on its own, so no merge waits
+# for the macOS runner. `workflow_call` stays for the private HAP build.
 on:
-  push:
-    branches: [main, 'claude/harmonyos-ohos', 'ohos/**']
-    paths:
-      - 'app/**'
-      - 'packages/**'
-      - 'tooling/ohos/**'
-      - '.github/workflows/ohos-compile.yml'
   workflow_dispatch:
   workflow_call:
     inputs:

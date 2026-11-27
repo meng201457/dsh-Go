@@ -1,14 +1,6 @@
 name: Tawcroot compatibility
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - '.github/workflows/tawcroot-compat.yml'
-      - 'runtime/tawcroot/**'
-      - 'runtime/tests/tawcroot_shm_probe.py'
-      - 'runtime/tests/test_tawcroot_build.py'
-      - 'runtime/lib/rtbuild.py'
   workflow_dispatch:
 
 concurrency:

@@ -8,9 +8,10 @@
 # 因而不会被关掉。维护者 reopen 视为一次性放行；其他人 reopen 再关一次。
 name: PR Gate
 
+# 本 fork 关掉了自动触发：要恢复外部 PR 门禁，把下面的 workflow_dispatch 换回
+# pull_request_target（types: [opened, reopened]）。
 on:
-  pull_request_target:
-    types: [opened, reopened]
+  workflow_dispatch:
 
 concurrency:
   group: pr-gate-${{ github.event.pull_request.number }}

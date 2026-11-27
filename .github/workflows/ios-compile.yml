@@ -5,14 +5,6 @@
 name: iOS compile
 
 on:
-  push:
-    branches: [main, 'feat/ios-**', 'ios/**']
-    paths:
-      - 'app/**'
-      - 'packages/**'
-      - 'tooling/ios/**'
-      - 'runtime/**'
-      - '.github/workflows/ios-compile.yml'
   workflow_dispatch:
     inputs:
       regression_only:
