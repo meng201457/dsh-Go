@@ -1,3 +1,4 @@
+# Fork: touched once to let GitHub re-register the workflow files.
 name: Render updated goldens
 
 on:
