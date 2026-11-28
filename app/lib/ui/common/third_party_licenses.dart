@@ -27,20 +27,6 @@ void registerThirdPartyLicenses({String? os}) {
     }
     final unicodeNotice = await rootBundle.loadString('assets/licenses/unicode-15.0.txt');
     yield LicenseEntryWithLineBreaks(<String>['Unicode Character Database (15.0.0)'], unicodeNotice);
-    // The libraries a card's scripts find on the tavern's canvas page, as 酒馆助手's pages
-    // give them; each package's own LICENSE file, verbatim.
-    yield LicenseEntryWithLineBreaks(<String>[
-      'jQuery',
-    ], await rootBundle.loadString('assets/licenses/jquery-3.7.1-LICENSE.txt'));
-    yield LicenseEntryWithLineBreaks(<String>[
-      'Lodash',
-    ], await rootBundle.loadString('assets/licenses/lodash-4.17.21-LICENSE.txt'));
-    yield LicenseEntryWithLineBreaks(<String>[
-      'Zod',
-    ], await rootBundle.loadString('assets/licenses/zod-4.6.7-LICENSE.txt'));
-    yield LicenseEntryWithLineBreaks(<String>[
-      'YAML (eemeli/yaml)',
-    ], await rootBundle.loadString('assets/licenses/yaml-2.9.1-LICENSE.txt'));
     // The streaming recognizer's model, downloaded on demand (語音 › 实时识别). HarmonyOS
     // has no streaming recognizer (sherpa-onnx ships Android's libraries only).
     if (!harmony) {

@@ -357,17 +357,6 @@ void main() {
       expect(runtime.calls, isEmpty);
     });
 
-    testWidgets('和角色聊天 → home in 酒馆, nothing installed and no key asked for', (tester) async {
-      final (runtime, container) = await pumpGate(tester);
-      await tester.tap(find.byKey(const ValueKey('runtime-option-tavern')));
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.tap(find.widgetWithText(FilledButton, '继续'));
-      await _frames(tester);
-      expect(find.text('home'), findsOneWidget);
-      expect(container.read(onboardingPrefsProvider).localDeclined, isTrue);
-      expect(container.read(appModeProvider).startup, AppMode.tavern);
-      expect(runtime.calls, isEmpty);
-    });
 
     testWidgets('a phone without the runtime opens home and starts nothing', (tester) async {
       final (runtime, _) = await pumpGate(

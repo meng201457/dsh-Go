@@ -3,8 +3,8 @@
 //
 //   share sheet        a lone `.dshgo` file or a share link → the share-code
 //                      importer (as if opened); a hosted conversation link →
-//                      its replay; a lone character card → 酒馆; anything
-//                      else → 新对话 with the text and attachments in the
+//                      its replay; anything else → 新对话 with the text and
+//                      attachments in the
 //                      composer, not sent
 //   launcher shortcut  新对话 / 语音输入 → 新对话 (listening) · a recent
 //                      conversation → that conversation, on its host
@@ -24,8 +24,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dsh_tavern/dsh_tavern.dart' show isDeepSeekExport;
-import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,8 +41,6 @@ import '../../state/sessions_state.dart';
 import '../common/discard_guard.dart';
 import '../companion/companion_page.dart';
 import '../companion/companion_tasks_page.dart';
-import '../tavern/tavern_deepseek_import.dart';
-import '../tavern/tavern_intake.dart';
 
 /// Draws nothing. Put it once in the home shell's stack, next to [LinkHost].
 class SystemEntryHost extends ConsumerStatefulWidget {
@@ -95,25 +91,6 @@ class _SystemEntryHostState extends ConsumerState<SystemEntryHost> {
     }
     if (share.shareLink case final link?) {
       ref.read(appLinksProvider).add(link.appLink);
-      return;
-    }
-    // A lone character card goes to 酒馆.
-    if (share.files case [final file]
-        when share.skipped.isEmpty && await isTavernCardFile(File(file.path), file.name)) {
-      final ui = ref.read(linkRouterProvider).context ?? (mounted ? context : null);
-      if (ui != null && ui.mounted) await openTavernCardFile(ui, ref, File(file.path), file.name);
-      // HarmonyOS's inbox holds the batch until it is used: the card has been read.
-      if (share.consumption case final consumption?) unawaited(consumption.finish());
-      return;
-    }
-    // DeepSeek's chat export goes to 酒馆 too, to be continued there.
-    if (share.files case [final file]
-        when share.skipped.isEmpty &&
-            file.name.toLowerCase().endsWith('.zip') &&
-            await compute(isDeepSeekExport, file.path)) {
-      final ui = ref.read(linkRouterProvider).context ?? (mounted ? context : null);
-      if (ui != null && ui.mounted) await takeInDeepSeekExport(ui, ref, path: file.path);
-      if (share.consumption case final consumption?) unawaited(consumption.finish());
       return;
     }
     // Android's native side keeps only a few unread shares, dropping the oldest

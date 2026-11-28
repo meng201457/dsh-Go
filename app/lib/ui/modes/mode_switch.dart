@@ -1,9 +1,8 @@
 // Switching 模式 (lib/state/app_mode_state.dart): the 模式 sheet, its key in
 // the drawer, and opening the startup mode on launch.
 //
-// 工作 is the home. 伙伴 and 酒馆 are full pages pushed over it, one at a
-// time: switching pops back to the home first, so back from a mode always
-// lands in 工作.
+// 工作 is the home. 伙伴 is a full page pushed over it: switching pops back to
+// the home first, so back from a mode always lands in 工作.
 
 import 'dart:async';
 
@@ -17,7 +16,6 @@ import '../common/sheet_title_bar.dart';
 import '../companion/companion_page.dart';
 import '../settings/settings_widgets.dart';
 import '../shell/page_frame.dart';
-import '../tavern/tavern_home_page.dart';
 import '../fx/waves/distortion_wave.dart';
 import '../theme/app_icons.dart';
 import '../theme/theme.dart';
@@ -25,7 +23,6 @@ import '../theme/theme.dart';
 /// The page of a mode other than 工作.
 Widget appModePage(AppMode mode) => switch (mode) {
   AppMode.companion => const CompanionPage(sections: true),
-  AppMode.tavern => const TavernHomePage(),
   AppMode.work => throw ArgumentError.value(mode, 'mode', '工作 is the home, not a page'),
 };
 
@@ -60,16 +57,14 @@ void openAppMode(BuildContext context, AppMode mode) {
 String appModeLabel(L10n l10n, AppMode mode) => switch (mode) {
   AppMode.work => l10n.modeWork,
   AppMode.companion => l10n.companionTitle,
-  AppMode.tavern => l10n.tavernTitle,
 };
 
 IconData appModeIcon(AppMode mode) => switch (mode) {
   AppMode.work => AppIcons.chat,
   AppMode.companion => AppIcons.pet,
-  AppMode.tavern => AppIcons.tavern,
 };
 
-/// 模式: the three modes, [current] marked, and which one a launch opens in.
+/// 模式: the modes, [current] marked, and which one a launch opens in.
 Future<void> showModeSheet(BuildContext context, {required AppMode current}) => showAppSheet<void>(
   context,
   isScrollControlled: true,
@@ -90,7 +85,6 @@ class ModeSheet extends ConsumerWidget {
     String subtitle(AppMode mode) => switch (mode) {
       AppMode.work => l10n.modeWorkSubtitle,
       AppMode.companion => l10n.companionEntrySubtitle,
-      AppMode.tavern => l10n.modeTavernSubtitle,
     };
     return SafeArea(
       top: false,
@@ -144,7 +138,6 @@ class ModeSheet extends ConsumerWidget {
 String appModeShortLabel(L10n l10n, AppMode mode) => switch (mode) {
   AppMode.work => l10n.modeWork,
   AppMode.companion => l10n.modeCompanionShort,
-  AppMode.tavern => l10n.tavernTitle,
 };
 
 /// The drawer's key to 模式, beside 网页模式.
@@ -167,7 +160,7 @@ class ModeKey extends StatelessWidget {
 }
 
 /// Opens the startup mode once per launch, before the home shows: until then
-/// it draws the backdrop, so a launch into 酒馆 doesn't flash 工作 first.
+/// it draws the backdrop, so a launch into 伙伴 doesn't flash 工作 first.
 class ModeLaunch extends ConsumerStatefulWidget {
   const ModeLaunch({super.key, required this.child});
 

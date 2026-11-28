@@ -250,18 +250,17 @@ jobs:
       - *flutter
       - name: Dependencies, and OpenSSH for the transport interoperability tests
         run: |
-          for pkg in dsh_client dsh_remote dsh_tavern; do
+          for pkg in dsh_client dsh_remote; do
             (cd "packages/$pkg" && dart pub get --enforce-lockfile)
           done
           (cd packages/dartssh2 && PUB_HOSTED_URL=https://pub.dev dart pub get)
           # The runner image has sshd; apt only if one day it does not (its mirror can stall for minutes).
           command -v sshd > /dev/null || { sudo apt-get update -q && sudo apt-get install -y --no-install-recommends openssh-server; }
           sudo mkdir -p /run/sshd
-      # The packages share nothing and dsh_tavern alone is most of the time: side by side, each
-      # with its own log, printed in order afterwards.
-      - name: Analyze and test the four packages side by side
+      # The packages share nothing: side by side, each with its own log, printed in order afterwards.
+      - name: Analyze and test the packages side by side
         run: |
-          names=(dsh_client dsh_remote dsh_tavern dartssh2)
+          names=(dsh_client dsh_remote dartssh2)
           pids=()
           for pkg in "${names[@]}"; do
             (

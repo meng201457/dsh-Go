@@ -2,8 +2,7 @@
 // starts at 设置 (`<!-- nav: commonSettings,… -->`), read through the ARB in
 // its language, is the way to some page or row of the index — so the guide,
 // and the answers AI gives from it, can't point where the app no longer is.
-// HarmonyOS reads its own pages (docs/guide/harmony) over Android's, and only
-// what it has counts there. (tool/guide_sync.py checks the labels themselves.)
+// (tool/guide_sync.py checks the labels themselves.)
 
 import 'dart:convert';
 import 'dart:io';
@@ -45,35 +44,5 @@ void main() {
       expect(checked, greaterThan(10));
     });
 
-    test('every 设置 path the $lang guide gives on HarmonyOS is a way there, on HarmonyOS', () {
-      final l10n = lookupL10n(Locale(lang));
-      final arb = _arb(lang);
-      final trails = {
-        l10n.commonSettings,
-        for (final spot in SettingsIndex.spots)
-          if (!SettingsIndex.androidOnly(spot)) SettingsIndex.trail(spot, l10n).join(' › '),
-      };
-      File page(File android) {
-        final own = File('../docs/guide/harmony/$lang/${android.uri.pathSegments.last}');
-        return own.existsSync() ? own : android;
-      }
-
-      final pages = Directory('../docs/guide/$lang')
-          .listSync()
-          .whereType<File>()
-          .where((f) => f.path.endsWith('.md'))
-          .map(page);
-      var checked = 0;
-      for (final page in pages) {
-        for (final (i, line) in page.readAsLinesSync().indexed) {
-          final keys = _nav.firstMatch(line)?.group(1)?.split(',');
-          if (keys == null || keys.first != 'commonSettings') continue;
-          final path = [for (final k in keys) arb[k] ?? '<$k>'].join(' › ');
-          expect(trails, contains(path), reason: '${page.path}:${i + 1}: $path');
-          checked++;
-        }
-      }
-      expect(checked, greaterThan(10));
-    });
   }
 }

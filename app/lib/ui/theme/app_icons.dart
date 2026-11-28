@@ -356,8 +356,6 @@ abstract final class AppIcons {
   static const webSearch = DshGlyphs.globeHemisphereWest;
   static const webApp = DshGlyphs.globe;
 
-  /// 酒馆设置 › 省电渲染.
-  static const lowPower = DshGlyphs.batteryPlus;
   static const mention = DshGlyphs.at;
   static const translate = DshGlyphs.translate;
   static const history = DshGlyphs.clockCounterClockwise;
@@ -415,13 +413,6 @@ abstract final class AppIcons {
   /// 设置 › 宠物.
   static const pet = DshGlyphs.smiley;
 
-  /// 模式 › 酒馆 (role play).
-  static const tavern = DshGlyphs.bookOpen;
-  static const lorebook = DshGlyphs.globe;
-  static const textSpeed = DshGlyphs.cursorText;
-  static const tavernContext = DshGlyphs.clockCounterClockwise;
-  static const tavernReplyLength = DshGlyphs.textAlignLeft;
-  static const tavernTemperature = DshGlyphs.slidersHorizontal;
 
   /// The drawer's key to 模式.
   static const modes = DshGlyphs.stack;

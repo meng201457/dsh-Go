@@ -1,7 +1,5 @@
 // The first-run question 「DSH 在哪里运行？」 — on this phone (install the runtime) or
-// on a remote host — with what each costs. On first run a third way is offered
-// beside them, 和角色聊天: 酒馆 alone, which needs neither, and the question
-// becomes 「想怎么用 dsh-Go？」.
+// on a remote host — with what each costs.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,8 +13,8 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import 'onboarding_scaffold.dart';
 
-/// Where DSH runs, or 酒馆 without it.
-enum RuntimeOption { local, remote, tavern }
+/// Where DSH runs.
+enum RuntimeOption { local, remote }
 
 /// Two option cards and one 「继续」:
 ///
@@ -41,14 +39,10 @@ enum RuntimeOption { local, remote, tavern }
 /// person picks one. A build without the native runtime
 /// ([LocalRuntimeState.available]) greys 本机 out and goes on with 远程主机.
 class RuntimeChoiceView extends ConsumerStatefulWidget {
-  const RuntimeChoiceView({super.key, required this.onLocal, required this.onRemote, this.onTavern, this.leading});
+  const RuntimeChoiceView({super.key, required this.onLocal, required this.onRemote, this.leading});
 
   final VoidCallback onLocal;
   final VoidCallback onRemote;
-
-  /// 和角色聊天 (first run only): 酒馆, with nothing installed. Null: no such
-  /// card, and the question stays where DSH runs.
-  final VoidCallback? onTavern;
 
   /// Top-left key, as [OnboardingScaffold.leading].
   final Widget? leading;
@@ -69,12 +63,7 @@ class _RuntimeChoiceViewState extends ConsumerState<RuntimeChoiceView> {
     final suggested = !available || light || footprint?.suggestRemote == true
         ? RuntimeOption.remote
         : RuntimeOption.local;
-    final selected = _picked == RuntimeOption.tavern
-        ? RuntimeOption.tavern
-        : available
-        ? _picked ?? suggested
-        : RuntimeOption.remote;
-    final onTavern = widget.onTavern;
+    final selected = available ? _picked ?? suggested : RuntimeOption.remote;
     final colors = DshColors.of(context);
 
     final String localDetail;
@@ -96,7 +85,7 @@ class _RuntimeChoiceViewState extends ConsumerState<RuntimeChoiceView> {
         const Spacer(),
         OnboardingHeader(
           icon: AppIcons.remoteHost,
-          title: onTavern == null ? l10n.localEnvChooseTitle : l10n.localEnvChooseUseTitle,
+          title: l10n.localEnvChooseTitle,
           message: l10n.localEnvChooseMessage,
         ),
         const SizedBox(height: 28),
@@ -119,24 +108,12 @@ class _RuntimeChoiceViewState extends ConsumerState<RuntimeChoiceView> {
           selected: selected == RuntimeOption.remote,
           onTap: () => setState(() => _picked = RuntimeOption.remote),
         ),
-        if (onTavern != null) ...[
-          const SizedBox(height: RuntimeOptionCard.gap),
-          RuntimeOptionCard(
-            key: const ValueKey('runtime-option-tavern'),
-            icon: AppIcons.tavern,
-            title: l10n.localEnvTavernTitle,
-            detail: l10n.localEnvTavernDetail,
-            selected: selected == RuntimeOption.tavern,
-            onTap: () => setState(() => _picked = RuntimeOption.tavern),
-          ),
-        ],
         const Spacer(flex: 2),
         const SizedBox(height: 24),
         FilledButton(
           onPressed: switch (selected) {
             RuntimeOption.local => widget.onLocal,
             RuntimeOption.remote => widget.onRemote,
-            RuntimeOption.tavern => onTavern,
           },
           child: Text(l10n.commonContinue),
         ),
