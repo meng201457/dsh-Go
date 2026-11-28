@@ -1,8 +1,0 @@
-{
-  "symbols": {
-    "productViewManager": {
-      "source": "@hms.core.appgalleryservice.productViewManager.d.ts",
-      "bindings": "default"
-    }
-  }
-}

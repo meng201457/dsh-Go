@@ -8,7 +8,6 @@ checkout builds without it unless the release machine puts it back.
                                         with the repository's character.json (the credit)
   tooling/companion_pack.py check APK   exit 1 unless APK carries the credited pack
 """
-import importlib.util
 import io
 import sys
 import zipfile
@@ -21,10 +20,16 @@ CHARACTER = 'character/character.json'
 
 
 def _credited(pack: Path) -> bytes:
-    spec = importlib.util.spec_from_file_location('bundle_companion_pack', REPO / 'tooling/ohos/bundle-companion-pack.py')
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module.credited(pack)
+    """The pack with the repository's character.json, order and deflate kept."""
+    character = (REPO / 'tooling/companion/whale-girl.character.json').read_bytes()
+    out = io.BytesIO()
+    with zipfile.ZipFile(pack) as source, zipfile.ZipFile(out, 'w') as target:
+        if CHARACTER not in source.namelist():
+            raise ValueError(f'{pack} has no {CHARACTER}')
+        for info in source.infolist():
+            data = character if info.filename == CHARACTER else source.read(info)
+            target.writestr(info, data, compress_type=info.compress_type)
+    return out.getvalue()
 
 
 def place(src: Path) -> None:
