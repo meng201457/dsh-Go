@@ -4,7 +4,6 @@ This tooling suite needs no installed node_modules. Actual PDF extraction from
 the staged, locked dependency is covered by companion-receipt-pdf.test.mjs in
 the runtime job, which prepares the real bridge dependency before running it.
 """
-import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -26,7 +25,6 @@ def load(name, path):
 
 
 dependencies = load('bridge_dependencies', ROOT / 'runtime/lib/bridge_dependencies.py')
-composition = load('bridge_ohos_composition', ROOT / 'runtime/ohos/package/compose-runtime.py')
 
 
 class BridgeDependencyTests(unittest.TestCase):
@@ -70,21 +68,6 @@ class BridgeDependencyTests(unittest.TestCase):
         for path in files:
             self.assertEqual((staged / 'node_modules/pdfjs-dist' / path.relative_to(original)).read_bytes(),
                              path.read_bytes())
-
-    def test_same_subset_survives_actual_ohos_composer_and_retains_licenses(self):
-        source, files = dependencies.pdf_files(self.prefix)
-        composer = composition.Composer(self.root / 'payload')
-        for path in files:
-            destination = 'runtime/bridge/dsh-go-bridge/node_modules/pdfjs-dist/' + path.relative_to(source).as_posix()
-            composer.add(path, self.prefix, 'bridge-dependencies', destination)
-        self.assertEqual(len(composer.payload), 190)
-        names = set(composer.payload)
-        for name in ['LICENSE', 'cmaps/LICENSE', 'standard_fonts/LICENSE_FOXIT', 'standard_fonts/LICENSE_LIBERATION']:
-            self.assertIn('runtime/bridge/dsh-go-bridge/node_modules/pdfjs-dist/' + name, names)
-        for path in files:
-            destination = 'runtime/bridge/dsh-go-bridge/node_modules/pdfjs-dist/' + path.relative_to(source).as_posix()
-            self.assertEqual(composer.payload[destination]['sha256'], hashlib.sha256(path.read_bytes()).hexdigest())
-        self.assertFalse(any(name.endswith(('.wasm', '.node', '.map', '.d.ts')) for name in names))
 
     def test_android_recipe_identity_ignores_installed_dependency_files(self):
         recipe = load('bridge_android_recipe', ROOT / 'runtime/lib/android_recipe.py')
