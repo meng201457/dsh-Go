@@ -1,0 +1,28 @@
+name: Lockfile
+
+# 一次性：用 CI 的 Flutter 重新解析 app/pubspec.lock（本机没有可用的 Flutter）。
+# 产物是 pubspec.lock，取回后提交，然后删掉这个工作流。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lock:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+          cache: true
+      - working-directory: app
+        run: flutter pub get
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pubspec-lock
+          path: app/pubspec.lock
+          if-no-files-found: error
